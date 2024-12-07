@@ -48,6 +48,33 @@ async function run() {
             res.send(result);
         })
 
+        app.get('/allmovies/updatemovie/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = {_id: new ObjectId(id)};
+            const result = await database.findOne(query);
+            res.send(result);
+        })
+
+        app.put('/allmovies/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = {_id: new ObjectId(id)};
+            const options = {upsert: true};
+            const updatedMovie = req.body;
+            const update = {
+                $set: {
+                    title: updatedMovie.title,
+                    year: updatedMovie.year,
+                    genre: updatedMovie.genre,
+                    summary: updatedMovie.summary,
+                    duration: updatedMovie.duration,
+                    poster: updatedMovie.poster,
+                    cover: updatedMovie.cover
+                }
+            }
+            const result = await database.updateOne(filter, update, options);
+            res.send(result);
+        })
+
         app.delete('/allmovies/:id', async (req, res) => {
             const id = req.params.id;
             const query = {_id: new ObjectId(id)};
