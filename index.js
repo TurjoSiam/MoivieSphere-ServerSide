@@ -41,6 +41,20 @@ async function run() {
             res.send(result);
         })
 
+        app.get('/actionmovies', async (req, res) => {
+            const query = {genre: 'Action'};
+            const cursor = database.find(query).limit(4);
+            const result = await cursor.toArray();
+            res.send(result);
+        })
+
+        app.get('/animatedmovies', async (req, res) => {
+            const query = {genre: 'Animated'};
+            const cursor = database.find(query).limit(4);
+            const result = await cursor.toArray();
+            res.send(result);
+        })
+
         app.get('/allmovies/:id', async (req, res) => {
             const id = req.params.id;
             const query = {_id: new ObjectId(id)};
