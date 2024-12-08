@@ -27,7 +27,8 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
 
-        const database = client.db("MovieSphere").collection("allMovies")
+        const database = client.db("MovieSphere").collection("allMovies");
+        const favoriteDB = client.db("MovieSphere").collection("favoriteMovies");
 
         app.get('/allmovies', async (req, res) => {
             const cursor = database.find();
@@ -102,6 +103,46 @@ async function run() {
             const result = await database.insertOne(newMovie);
             res.send(result);
         })
+
+
+        // favorite movie functionality
+        app.post('/favoritemovies', async (req, res) => {
+            const newMovie = req.body;
+            const result = await favoriteDB.insertOne(newMovie);
+            res.send(result);
+        })
+
+        app.get('/favoritemovies', async (req, res) => {
+            const cursor = favoriteDB.find();
+            const result = await cursor.toArray();
+            res.send(result);
+        })
+
+
+        app.get('/favoritemovies/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = {email: email};
+            const cursor = favoriteDB.find(query);
+            const result = await cursor.toArray()
+            res.send(result);
+        })
+
+        app.get('/favoritemovies/:email/:id', async (req, res) => {
+            const id = req.params.id;
+            const email = req.params.email;
+            const query = {email: email, _id: new ObjectId(id),};
+            const result = await favoriteDB.findOne(query);
+            res.send(result);
+        })
+
+        app.delete('/favoritemovies/:email/:id', async (req, res) => {
+            const id = req.params.id;
+            const email = req.params.email;
+            const query = {email: email, _id: new ObjectId(id)};
+            const result = await favoriteDB.deleteOne(query);
+            res.send(result);
+        })
+
 
 
 
