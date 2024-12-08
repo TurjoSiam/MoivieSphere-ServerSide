@@ -1,6 +1,6 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-require('dotenv').config();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 const app = express();
@@ -11,9 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 
-
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.k0g53.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
-
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -30,6 +28,8 @@ async function run() {
         const database = client.db("MovieSphere").collection("allMovies");
         const favoriteDB = client.db("MovieSphere").collection("favoriteMovies");
 
+
+        // crud operation in main database
         app.get('/allmovies', async (req, res) => {
             const cursor = database.find();
             const result = await cursor.toArray();
@@ -43,14 +43,14 @@ async function run() {
         })
 
         app.get('/actionmovies', async (req, res) => {
-            const query = {genre: 'Action'};
+            const query = { genre: 'Action' };
             const cursor = database.find(query).limit(4);
             const result = await cursor.toArray();
             res.send(result);
         })
 
         app.get('/animatedmovies', async (req, res) => {
-            const query = {genre: 'Animated'};
+            const query = { genre: 'Animated' };
             const cursor = database.find(query).limit(4);
             const result = await cursor.toArray();
             res.send(result);
@@ -58,22 +58,22 @@ async function run() {
 
         app.get('/allmovies/:id', async (req, res) => {
             const id = req.params.id;
-            const query = {_id: new ObjectId(id)};
+            const query = { _id: new ObjectId(id) };
             const result = await database.findOne(query);
             res.send(result);
         })
 
         app.get('/allmovies/updatemovie/:id', async (req, res) => {
             const id = req.params.id;
-            const query = {_id: new ObjectId(id)};
+            const query = { _id: new ObjectId(id) };
             const result = await database.findOne(query);
             res.send(result);
         })
 
         app.put('/allmovies/:id', async (req, res) => {
             const id = req.params.id;
-            const filter = {_id: new ObjectId(id)};
-            const options = {upsert: true};
+            const filter = { _id: new ObjectId(id) };
+            const options = { upsert: true };
             const updatedMovie = req.body;
             const update = {
                 $set: {
@@ -92,7 +92,7 @@ async function run() {
 
         app.delete('/allmovies/:id', async (req, res) => {
             const id = req.params.id;
-            const query = {_id: new ObjectId(id)};
+            const query = { _id: new ObjectId(id) };
             const result = await database.deleteOne(query);
             res.send(result);
         })
@@ -105,7 +105,7 @@ async function run() {
         })
 
 
-        // favorite movie functionality
+        // crud operation in favorite movies database
         app.post('/favoritemovies', async (req, res) => {
             const newMovie = req.body;
             const result = await favoriteDB.insertOne(newMovie);
@@ -118,10 +118,9 @@ async function run() {
             res.send(result);
         })
 
-
         app.get('/favoritemovies/:email', async (req, res) => {
             const email = req.params.email;
-            const query = {email: email};
+            const query = { email: email };
             const cursor = favoriteDB.find(query);
             const result = await cursor.toArray()
             res.send(result);
@@ -130,7 +129,7 @@ async function run() {
         app.get('/favoritemovies/:email/:id', async (req, res) => {
             const id = req.params.id;
             const email = req.params.email;
-            const query = {email: email, _id: new ObjectId(id),};
+            const query = { email: email, _id: new ObjectId(id), };
             const result = await favoriteDB.findOne(query);
             res.send(result);
         })
@@ -138,13 +137,10 @@ async function run() {
         app.delete('/favoritemovies/:email/:id', async (req, res) => {
             const id = req.params.id;
             const email = req.params.email;
-            const query = {email: email, _id: new ObjectId(id)};
+            const query = { email: email, _id: new ObjectId(id) };
             const result = await favoriteDB.deleteOne(query);
             res.send(result);
         })
-
-
-
 
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     }
@@ -153,7 +149,6 @@ async function run() {
     }
 }
 run().catch(console.dir);
-
 
 
 
